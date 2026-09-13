@@ -48,17 +48,25 @@ async def list_all(status: Optional[str] = None, severity: Optional[str] = None,
     records = complaint_service.list_complaints(db, status, severity, search)
     return [{"id": x.id, "complaint_id": x.complaint_id, "customer_name": x.customer_name, "product_name": x.product_name, "initial_severity": x.initial_severity, "priority": x.priority, "status": x.status, "created_at": x.created_at} for x in records]
 
+def _find_complaint(db: Session, complaint_id: str):
+    """Resolve either the internal numeric ID or public CMP-YYYY-NNNN ID."""
+    if complaint_id.isdigit():
+        item = db.get(Complaint, int(complaint_id))
+    else:
+        item = db.query(Complaint).filter(Complaint.complaint_id == complaint_id).first()
+    return item
+
 @router.get("/{complaint_id}")
-async def get_one(complaint_id: int, db: Session = Depends(get_db)):
+async def get_one(complaint_id: str, db: Session = Depends(get_db)):
     """Return one full complaint record."""
-    item = db.get(Complaint, complaint_id)
+    item = _find_complaint(db, complaint_id)
     if not item: raise HTTPException(404, "Complaint not found")
     return {column.name: getattr(item, column.name) for column in Complaint.__table__.columns}
 
 @router.post("/{complaint_id}/chat")
-async def chat(complaint_id: int, request: ChatRequest, db: Session = Depends(get_db)):
+async def chat(complaint_id: str, request: ChatRequest, db: Session = Depends(get_db)):
     """Persist a user question, generate a contextual answer, and return form updates."""
-    complaint = db.get(Complaint, complaint_id)
+    complaint = _find_complaint(db, complaint_id)
     if not complaint: raise HTTPException(404, "Complaint not found")
     db.add(ChatMessage(complaint_id=complaint.id, role="user", content=request.message))
     
