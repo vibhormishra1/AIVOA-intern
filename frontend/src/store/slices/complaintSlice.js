@@ -5,13 +5,14 @@ const initialForm={complaint_source:'',customer_name:'',product_name:'',product_
 const hasValue = value => value !== null && value !== undefined && value !== '';
 const mergeMeaningfulFields = (current, incoming) => Object.fromEntries(Object.entries(incoming || {}).filter(([, value]) => hasValue(value)));
 const appendRawText = (current, next) => next ? [current, next].filter(Boolean).join('\n\n') : current;
+const severityFromRisk = risk => risk.initial_severity || ({'High Risk':'Critical', 'Medium Risk':'Major', 'Low Risk':'Minor'}[risk.risk_category] || (Number(risk.risk_score) >= 80 ? 'Critical' : Number(risk.risk_score) >= 50 ? 'Major' : 'Minor'));
 export const triggerExtraction=createAsyncThunk('complaint/extract',async(payload)=>(await requestExtraction(payload)).data);
 export const submitComplaint=createAsyncThunk('complaint/save',async(payload)=>(await requestSave(payload)).data);
 const applyExtraction = (state, data) => {
   const risk = data.risk_classification || {};
   const aiFields = {
     ...data.extracted_fields,
-    initial_severity: risk.initial_severity,
+    initial_severity: severityFromRisk(risk),
     priority: risk.priority,
   };
   state.formData = {

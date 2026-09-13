@@ -46,12 +46,26 @@ def _normalize_fields(fields: dict, text: str) -> dict:
     """Apply deterministic domain normalization after the LLM or fallback parser."""
     normalized = {**fields}
 
-    # In conversational reports, the organization before 'reported' is the customer.
-    reporter = re.search(r"(?:^|[.!?])\s*([A-Z][A-Za-z0-9&.' -]{1,100}?)\s+reported\b", text)
+    # Prefer explicit reference labels in PDFs and forms.
+    labeled_customer = re.search(r"(?im)^\s*Customer\s*(?::|-)?\s*([^\n]+)", text)
+    labeled_source = re.search(r"(?im)^\s*(?:Reporting channel|Complaint source)\s*(?::|-)?\s*([^\n]+)", text)
+    customer = labeled_customer.group(1).strip(" .,-") if labeled_customer else None
+    if labeled_source:
+        normalized["complaint_source"] = labeled_source.group(1).strip(" .,-")
+
+    # Otherwise, use the first organization with a pharmacy/hospital/clinic
+    # role before the word 'reported'. This avoids matching later phrases such
+    # as 'No patient injury was reported'.
+    reporter = re.search(
+        r"\b([A-Z][A-Za-z0-9&.'-]{1,80}\s+(?:Pharmacy|Hospital|Clinic))\s+reported\b",
+        text,
+    )
     if not reporter:
         reporter = re.search(r"\b([A-Z][A-Za-z0-9&.' -]{1,100}?)\s+reported\b", text)
-    if reporter:
+    if not customer and reporter:
         customer = reporter.group(1).strip(" .,-")
+
+    if customer:
         normalized["customer_name"] = customer
         lower_customer = customer.lower()
         channel_map = (
