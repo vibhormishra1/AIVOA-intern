@@ -1,4 +1,75 @@
-import {useSelector,useDispatch} from 'react-redux'; import {updateField} from '../../store/slices/complaintSlice';
-const sections=[['Origin & customer',['complaint_source','customer_name']],['Product & batch',['product_name','product_strength','batch_lot_number','manufacturing_date','expiry_date','quantity_affected']],['Complaint details',['complaint_type','complaint_date','description']],['Initial assessment',['initial_severity','priority']]];
-const labels={complaint_source:'Complaint source',customer_name:'Customer name',product_name:'Product name',product_strength:'Strength / grade',batch_lot_number:'Batch / lot number',manufacturing_date:'Manufacturing date',expiry_date:'Expiry date',quantity_affected:'Quantity affected (kg)',complaint_type:'Complaint type',complaint_date:'Complaint date',description:'Detailed description',initial_severity:'Initial severity',priority:'Priority'};
-export default function ComplaintForm({onSave,savedId}){const {formData,aiMetadata,submitStatus}=useSelector(s=>s.complaint); const dispatch=useDispatch(); const set=(name,value)=>dispatch(updateField({name,value})); return <main className="formcard"><header className="formhead"><div><div className="eyebrow">CUSTOMER COMPLAINT</div><h1>Log customer complaint</h1></div><span className="status">{savedId||'Pending Triage'}</span></header>{sections.map(([title,fields],i)=><section className="formsection" key={title}><h3><i>{i+1}</i>{title}</h3><div className="grid">{fields.map(f=>f==='description'?<label className="wide" key={f}>{labels[f]}<textarea value={formData[f]||''} onChange={e=>set(f,e.target.value)} placeholder="Awaiting AI extraction..."/></label>:<label key={f}>{labels[f]}<input type={f.includes('date')?'date':'text'} value={formData[f]||''} onChange={e=>set(f,e.target.value)} placeholder="Awaiting AI extraction..."/></label>)}</div></section>)}<button className="primary" onClick={()=>onSave(formData)} disabled={submitStatus==='loading'}>{submitStatus==='loading'?'Saving...':'Save complaint'}</button>{savedId&&<div className="success">Saved as {savedId}</div>}</main>}
+import { useSelector, useDispatch } from 'react-redux';
+import { updateField } from '../../store/slices/complaintSlice';
+
+const sections = [
+  ['1. ORIGIN & CUSTOMER DETAILS', ['complaint_source', 'customer_name']],
+  ['2. PRODUCT & BATCH IDENTIFICATION', ['product_name', 'product_strength', 'batch_lot_number', 'manufacturing_date', 'expiry_date', 'quantity_affected']],
+  ['3. FACILITY & MATERIAL IMPACT', ['complaint_type', 'complaint_date']],
+  ['4. DEFECT ANALYSIS', ['initial_severity', 'description']]
+];
+
+const labels = {
+  complaint_source: 'Complaint Source', customer_name: 'Customer Name',
+  product_name: 'Product Name', product_strength: 'Product Strength',
+  batch_lot_number: 'Batch / Lot Number', manufacturing_date: 'Manufacturing Date',
+  expiry_date: 'Expiry Date', quantity_affected: 'Affected Quantity',
+  complaint_type: 'Complaint Category', complaint_date: 'Complaint Date',
+  description: 'Complaint Description', initial_severity: 'Severity (Suggested)',
+  priority: 'Suggested Next Action'
+};
+
+export default function ComplaintForm({ onSave, savedId }) {
+  const { formData, submitStatus } = useSelector(s => s.complaint);
+  const dispatch = useDispatch();
+  const set = (name, value) => dispatch(updateField({ name, value }));
+
+  return (
+    <main className="formcard">
+      <header className="formhead">
+        <div>
+          <h1>Log Customer Complaint</h1>
+          <p>API & FDF Quality Assurance Module</p>
+        </div>
+        <span className={`status-badge ${savedId ? 'ready' : 'pending'}`}>
+          {savedId ? 'Ready to Commit' : 'Pending Triage'}
+        </span>
+      </header>
+
+      {sections.map(([title, fields]) => (
+        <section className="formsection" key={title}>
+          <h3>{title}</h3>
+          <div className="grid">
+            {fields.map(f => f === 'description' ? (
+              <label className="wide" key={f}>
+                {labels[f]}
+                <textarea 
+                  value={formData[f] || ''} 
+                  onChange={e => set(f, e.target.value)} 
+                  placeholder="Awaiting AI extraction..."
+                />
+              </label>
+            ) : (
+              <label key={f}>
+                {labels[f]}
+                <input 
+                  type={f.includes('date') ? 'date' : 'text'} 
+                  value={formData[f] || ''} 
+                  onChange={e => set(f, e.target.value)} 
+                  placeholder="Awaiting AI extraction..."
+                />
+              </label>
+            ))}
+          </div>
+        </section>
+      ))}
+      
+      <button 
+        className="primary-btn" 
+        onClick={() => onSave(formData)} 
+        disabled={submitStatus === 'loading'}
+      >
+        {submitStatus === 'loading' ? 'Committing...' : 'Commit to QMS Ledger'}
+      </button>
+    </main>
+  );
+}

@@ -10,10 +10,31 @@ from ..models import Complaint, ChatMessage
 
 router = APIRouter(prefix="/api/v1/complaints", tags=["complaints"])
 
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+
 @router.post("/extract")
-async def extract(request: ComplaintExtractionRequest, db: Session = Depends(get_db)):
+async def extract(
+    db: Session = Depends(get_db),
+    file: Optional[UploadFile] = File(None),
+    file_content: Optional[str] = Form(None),
+    file_type: str = Form("txt")
+):
     """Extract fields and AI metadata from pasted text or an uploaded document."""
-    return await ai_service.extract_complaint(request.file_content, request.file_type, db)
+    text_content = ""
+    if file:
+        file_bytes = await file.read()
+        if file.filename.lower().endswith(".pdf"):
+            text_content = ai_service.parse_pdf_bytes(file_bytes)
+            file_type = "pdf"
+        else:
+            text_content = file_bytes.decode('utf-8', errors='ignore')
+    elif file_content:
+        text_content = file_content
+        
+    if not text_content:
+        raise HTTPException(400, "No text or file provided")
+        
+    return await ai_service.extract_complaint(text_content, file_type, db)
 
 @router.post("")
 async def create(request: ComplaintCreateRequest, db: Session = Depends(get_db)):
@@ -36,10 +57,16 @@ async def get_one(complaint_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{complaint_id}/chat")
 async def chat(complaint_id: int, request: ChatRequest, db: Session = Depends(get_db)):
-    """Persist a user question, generate a contextual answer, and persist it."""
+    """Persist a user question, generate a contextual answer, and return form updates."""
     complaint = db.get(Complaint, complaint_id)
     if not complaint: raise HTTPException(404, "Complaint not found")
     db.add(ChatMessage(complaint_id=complaint.id, role="user", content=request.message))
-    answer = await ai_service.chat_with_complaint(complaint, request.message)
-    db.add(ChatMessage(complaint_id=complaint.id, role="assistant", content=answer)); db.commit()
-    return {"role": "assistant", "response": answer}
+    
+    # Get structured JSON back from AI
+    result = await ai_service.chat_with_complaint(complaint, request.message)
+    response_text = result.get("response", "No response generated.")
+    updated_fields = result.get("updated_fields", {})
+    
+    db.add(ChatMessage(complaint_id=complaint.id, role="assistant", content=response_text))
+    db.commit()
+    return {"role": "assistant", "response": response_text, "updated_fields": updated_fields}

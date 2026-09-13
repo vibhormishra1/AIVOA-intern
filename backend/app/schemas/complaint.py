@@ -32,3 +32,8 @@ class ComplaintCreateRequest(BaseModel):
 class ChatRequest(BaseModel):
     """Question sent to the complaint copilot."""
     message: str = Field(min_length=1, max_length=4000)
+
+class ChatResponse(BaseModel):
+    """Structured response from the copilot."""
+    response: str
+    updated_fields: dict = {}

@@ -7,3 +7,4 @@ groq==0.15.0
 langgraph==0.2.60
 psycopg[binary]==3.2.13
 psycopg2-binary==2.9.12
+pymupdf==1.25.1
