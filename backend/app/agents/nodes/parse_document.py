@@ -69,6 +69,12 @@ def _normalize_fields(fields: dict, text: str) -> dict:
     for field in ("manufacturing_date", "expiry_date", "complaint_date"):
         normalized[field] = _canonical_date(normalized.get(field)) or _date_from_text(text, field.replace("_", " "))
 
+    # The complaint is being entered now, so use today's date when the source
+    # report does not provide a separate incident date.
+    if not normalized.get("complaint_date"):
+        from datetime import date
+        normalized["complaint_date"] = date.today().isoformat()
+
     return normalized
 
 def _demo_extract(text: str) -> dict:
