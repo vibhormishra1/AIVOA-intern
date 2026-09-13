@@ -1,0 +1,12 @@
+Complaint source: Phone
+Customer name: CityCare Clinic
+Product name: Cetirizine Oral Solution
+Product strength: 5 mg/5 mL
+Batch lot number: CET-2207
+Manufacturing date: 2026-05-20
+Expiry date: 2028-05-19
+Quantity affected: 12
+Quantity unit: kg
+Complaint type: Adverse Event
+Complaint date: 2026-09-06
+Description: Pharmacist reported one patient developed an allergic reaction after taking the product and was sent to hospital. Product remains available at the clinic and requires immediate QA escalation.

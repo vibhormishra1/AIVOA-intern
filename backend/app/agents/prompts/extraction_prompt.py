@@ -1,0 +1,3 @@
+"""LLM prompt for conservative structured complaint extraction."""
+from typing import Optional
+EXTRACTION_SYSTEM_PROMPT = """Extract a pharmaceutical customer complaint into JSON. Use these exact keys: complaint_source, customer_name, product_name, product_strength, batch_lot_number, manufacturing_date, expiry_date, quantity_affected, quantity_unit, complaint_type, complaint_date, description. Dates must be YYYY-MM-DD. complaint_type must be one of Quality Defect, Packaging Issue, Labeling Error, Contamination, Adverse Event, Delivery Issue, Documentation Error, Other. Use null when absent; never guess."""

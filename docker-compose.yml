@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: aivoa
+      POSTGRES_USER: aivoa
+      POSTGRES_PASSWORD: aivoa
+    ports: ["5432:5432"]
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://aivoa:aivoa@postgres:5432/aivoa
+      ALLOWED_ORIGINS: http://localhost:5173
+    ports: ["8000:8000"]
+    depends_on: [postgres]
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes: ["./frontend:/app"]
+    command: sh -c "npm install && npm run start"
+    ports: ["5173:5173"]

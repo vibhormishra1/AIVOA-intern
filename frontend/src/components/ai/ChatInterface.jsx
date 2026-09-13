@@ -1,0 +1,4 @@
+import {useState} from 'react';
+import {chatComplaint} from '../../api/complaintApi';
+/** Complaint copilot that sends contextual questions to the backend. */
+export default function ChatInterface({complaintId}){const [question,setQuestion]=useState('');const [answer,setAnswer]=useState('');const [loading,setLoading]=useState(false);const ask=async()=>{if(!question.trim()||!complaintId)return;setLoading(true);try{const r=await chatComplaint(complaintId,question);setAnswer(r.data.response);setQuestion('')}finally{setLoading(false)}};return <div className="chat"><b>AI Copilot</b><small>Suggestions are not QA approval.</small><input value={question} onChange={e=>setQuestion(e.target.value)} placeholder="Ask about this complaint..." onKeyDown={e=>e.key==='Enter'&&ask()}/><button onClick={ask} disabled={loading}>{loading?'Thinking...':'Ask copilot'}</button>{answer&&<p>{answer}</p>}</div>}

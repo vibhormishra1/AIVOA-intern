@@ -1,0 +1,1 @@
+import {configureStore} from '@reduxjs/toolkit'; import complaint from './slices/complaintSlice'; import dashboard from './slices/dashboardSlice'; import chat from './slices/chatSlice'; export default configureStore({reducer:{complaint,dashboard,chat}});

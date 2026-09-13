@@ -1,0 +1,1 @@
+import {createSlice} from '@reduxjs/toolkit'; export default createSlice({name:'chat',initialState:{messages:[]},reducers:{addMessage:(s,a)=>{s.messages.push(a.payload)},clearChat:(s)=>{s.messages=[]}}}).reducer; export const {addMessage,clearChat}=createSlice({name:'chatActions',initialState:{},reducers:{addMessage:(s)=>s,clearChat:(s)=>s}}).actions;

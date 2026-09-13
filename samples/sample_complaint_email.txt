@@ -1,0 +1,13 @@
+Complaint source: Email
+Customer name: Meridian Hospital Pharmacy
+Product name: Paracetamol Tablets
+Product strength: 650 mg
+Batch lot number: P-9099
+Manufacturing date: 2026-07-12
+Expiry date: 2028-07-11
+Quantity affected: 18
+Quantity unit: kg
+Complaint type: Quality Defect
+Complaint date: 2026-09-04
+Initial report: Tablets failed dissolution testing and several tablets broke during dispensing. No patient injury has been reported. Please investigate batch P-9099 and advise on containment.
+Description: Tablets failed dissolution testing and several tablets broke during dispensing. No patient injury has been reported. Please investigate batch P-9099 and advise on containment.

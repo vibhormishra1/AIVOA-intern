@@ -1,0 +1,12 @@
+Complaint source: Written
+Customer name: Northstar Distributors
+Product name: Amoxicillin Capsules
+Product strength: 500 mg
+Batch lot number: AMX-4412
+Manufacturing date: 2026-06-01
+Expiry date: 2028-05-31
+Quantity affected: 4
+Quantity unit: kg
+Complaint type: Packaging Issue
+Complaint date: 2026-09-02
+Description: Twenty cartons arrived with damaged seals and visible moisture inside the secondary packaging. Product is quarantined pending QA review.
