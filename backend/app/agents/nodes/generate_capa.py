@@ -56,9 +56,13 @@ async def generate_capa(state):
             result = json.loads(response.choices[0].message.content)
             suggestions = result.get("capa_suggestions")
         except Exception as exc:
-            state.setdefault("errors", []).append(f"AI CAPA generation failed, using fallback: {exc}")
+            state.setdefault("errors", []).append(f"AI CAPA generation failed: {exc}")
+            if not settings.enable_fallback_mocks:
+                raise
             
     if not suggestions:
+        if not settings.enable_fallback_mocks:
+            raise RuntimeError("CAPA generation requires Groq API key when fallbacks are disabled.")
         suggestions = _fallback_capa(severity)
         
     return {**state, "capa_suggestions": suggestions, "processing_status": "capa_generated"}

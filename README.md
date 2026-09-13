@@ -61,6 +61,8 @@ cp backend/.env.example backend/.env
 | **`APP_ENV`** | **Optional** | `development` | `backend/.env` | Sets application mode (`development` or `production`). |
 | **`MODEL_EXTRACTION`** | **Optional** | `gemma2-9b-it` | `backend/.env` | Groq model used for rapid JSON field extraction. |
 | **`MODEL_REASONING`** | **Optional** | `llama-3.3-70b-versatile` | `backend/.env` | Groq model used for clinical risk triage and CAPA generation. |
+| **`ENABLE_FALLBACK_MOCKS`** | **Optional** | `True` | `backend/.env` | If True, app gracefully falls back to regex/rules if AI fails. Set to `False` in strict production. |
+| **`DUPLICATE_SIMILARITY_THRESHOLD`**| **Optional** | `0.25` | `backend/.env` | The Jaccard token overlap similarity score required to flag a duplicate record. |
 
 ### 2. Frontend Environment Variables (`frontend/.env`)
 

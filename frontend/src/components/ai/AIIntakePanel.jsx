@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { chatComplaint } from '../../api/complaintApi';
 import { updateFields } from '../../store/slices/complaintSlice';
@@ -12,6 +12,28 @@ export default function AIIntakePanel({ complaintId, onFile, progress, message, 
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (progress === 100 && metadata) {
+      const risk = metadata.risk_classification;
+      const capaCount = metadata.capa_suggestions?.length || 0;
+      setChatHistory(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `Extracted complaint fields and populated the form. Risk Assessment: ${risk?.risk_category || 'Assessed'} (Score: ${risk?.risk_score || 'N/A'}/100, Priority: ${risk?.priority || 'Normal'}). Generated ${capaCount} CAPA suggestions. Review the form and click "Save Complaint" when ready.`
+        }
+      ]);
+    } else if (message && message.startsWith('Error:')) {
+      setChatHistory(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `AI processing failed: ${message.replace('Error: ', '')}. Please check server connectivity.`
+        }
+      ]);
+    }
+  }, [progress, metadata, message]);
 
   const handleSend = async () => {
     if (!inputValue.trim()) return;
@@ -94,7 +116,7 @@ export default function AIIntakePanel({ complaintId, onFile, progress, message, 
             placeholder="Type a message or paste a complaint..." 
             onKeyDown={e => e.key === 'Enter' && handleSend()}
           />
-          <button onClick={handleSend} disabled={loading}>
+          <button onClick={handleSend} disabled={loading || (progress > 0 && progress < 100)}>
             <Send size={16} />
           </button>
         </div>

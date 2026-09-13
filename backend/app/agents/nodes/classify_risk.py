@@ -21,11 +21,11 @@ Guidelines:
 - Low Risk / Minor / Medium or Low (Score 0-49): Packaging issues without product impact, missing labels, general inquiries.
 """
 
-def _fallback_classify(text: str) -> dict:
+def _fallback_classify(text: str, settings) -> dict:
     """Deterministic fallback if API fails."""
     high = any(word in text for word in ["death", "hospital", "contamination", "allergic", "wrong strength", "adverse event"])
     major = any(word in text for word in ["dissolution", "failed", "broken", "leak", "foreign matter", "recall"])
-    score = 85 if high else 65 if major else 30
+    score = settings.risk_score_critical if high else settings.risk_score_major if major else settings.risk_score_minor
     return {
         "risk_score": score,
         "risk_category": "High Risk" if high else "Medium Risk" if major else "Low Risk",
@@ -56,9 +56,13 @@ async def classify_risk(state):
             )
             result = json.loads(response.choices[0].message.content)
         except Exception as exc:
-            state.setdefault("errors", []).append(f"AI risk classification failed, using fallback: {exc}")
+            state.setdefault("errors", []).append(f"AI risk classification failed: {exc}")
+            if not settings.enable_fallback_mocks:
+                raise
     
     if not result:
-        result = _fallback_classify(text)
+        if not settings.enable_fallback_mocks:
+            raise RuntimeError("Risk classification requires Groq API key when fallbacks are disabled.")
+        result = _fallback_classify(text, settings)
         
     return {**state, "risk_classification": result, "processing_status": "risk_classified"}
