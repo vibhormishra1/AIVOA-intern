@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     allowed_origins: str = "http://localhost:3000"
     app_env: str = "development"
-    model_extraction: str = "gemma2-9b-it"
-    model_reasoning: str = "llama-3.3-70b-versatile"
+    model_extraction: str = "openai/gpt-oss-20b"
+    model_reasoning: str = "openai/gpt-oss-20b"
     
     # App logic parameters
     duplicate_similarity_threshold: float = 0.25

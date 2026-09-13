@@ -31,9 +31,9 @@ Built with a **FastAPI** backend, a compiled **LangGraph** AI agent pipeline, **
 
 - 🧠 **Compiled LangGraph Pipeline:** True `StateGraph` executing 6 discrete nodes: `parse_document` ➔ `validate_completeness` ➔ `classify_risk` ➔ `check_duplicates` ➔ `generate_capa` ➔ `assemble`.
 - ⚡ **Tiered Groq LLM Inference:**
-  - `gemma2-9b-it` (temperature 0.1, JSON mode) for rapid structured 12-field extraction.
-  - `llama-3.3-70b-versatile` (JSON mode) for deep clinical risk triage and CAPA generation citing FDA 21 CFR 211.198 and ICH Q10.
-  - `llama-3.3-70b-versatile` for contextual AI Copilot investigation.
+  - `openai/gpt-oss-20b` (temperature 0.1, JSON mode) for rapid structured 12-field extraction.
+  - `openai/gpt-oss-20b` (JSON mode) for deep clinical risk triage and CAPA generation citing FDA 21 CFR 211.198 and ICH Q10.
+  - `openai/gpt-oss-20b` for contextual AI Copilot investigation.
 - 🛡️ **Zero-Crash Offline Fallbacks:** Deterministic regex parsing and keyword triage guarantee the system functions gracefully even without an active API key or internet connection.
 - 📋 **Deterministic Regulatory Completeness:** Pure-Python scoring evaluating critical batch, customer, date, and description fields.
 - 🔢 **Audit-Ready ID Sequencing:** Real database persistence generating sequential IDs: `CMP-YYYY-NNNN`.
@@ -59,8 +59,8 @@ cp backend/.env.example backend/.env
 | **`DATABASE_URL`** | **Optional** | `sqlite:///./aivoa.db` | `backend/.env` | **Uses SQLite**: Defaults to a local SQLite database (`aivoa.db`). For PostgreSQL / pgvector, set: `postgresql+psycopg://user:pass@localhost:5432/aivoa`. |
 | **`ALLOWED_ORIGINS`** | **Optional** | `http://localhost:5173,http://localhost:3000` | `backend/.env` | **CORS Control**: Comma-separated list of allowed frontend URLs. Defaults to `http://localhost:3000`. Set to `http://localhost:5173` for default Vite frontend. |
 | **`APP_ENV`** | **Optional** | `development` | `backend/.env` | Sets application mode (`development` or `production`). |
-| **`MODEL_EXTRACTION`** | **Optional** | `gemma2-9b-it` | `backend/.env` | Groq model used for rapid JSON field extraction. |
-| **`MODEL_REASONING`** | **Optional** | `llama-3.3-70b-versatile` | `backend/.env` | Groq model used for clinical risk triage and CAPA generation. |
+| **`MODEL_EXTRACTION`** | **Optional** | `openai/gpt-oss-20b` | `backend/.env` | Groq model used for rapid JSON field extraction. |
+| **`MODEL_REASONING`** | **Optional** | `openai/gpt-oss-20b` | `backend/.env` | Groq model used for clinical risk triage and CAPA generation. |
 | **`ENABLE_FALLBACK_MOCKS`** | **Optional** | `True` | `backend/.env` | If True, app gracefully falls back to regex/rules if AI fails. Set to `False` in strict production. |
 | **`DUPLICATE_SIMILARITY_THRESHOLD`**| **Optional** | `0.25` | `backend/.env` | The Jaccard token overlap similarity score required to flag a duplicate record. |
 
